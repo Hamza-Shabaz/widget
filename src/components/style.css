@@ -1,5 +1,8 @@
 .chat_wrapper {
-    width: 450px;
+    width: 500px;
+    position: fixed;
+    right: 70px;
+    bottom: 60px;
 }
 .chat_button {
     background-color: #00a5f0;
