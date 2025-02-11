@@ -43,16 +43,41 @@ const ChatWidget = () => {
       });
       setIsLoading(false);
       // Simulate bot response
-      if (response.choices[0].message.content) {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          {
-            text: response.choices[0].message.content || "how can I help you ?",
-            sender: "bot",
-          },
-        ]);
-      }
+      const botResponse =
+        response.choices[0]?.message?.content || "How can I help you?";
+
+      // Call the typing effect function
+      simulateTyping(botResponse);
     }
+  };
+
+  const simulateTyping = (text: string) => {
+    let index = 0;
+    const typingSpeed = 50; // Adjust speed as needed (ms per character)
+
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { text: "", sender: "bot" },
+    ]);
+
+    const interval = setInterval(() => {
+      setMessages((prevMessages) => {
+        const updatedMessages = [...prevMessages];
+        const lastMessage = updatedMessages[updatedMessages.length - 1];
+
+        if (lastMessage.sender === "bot") {
+          lastMessage.text += text.charAt(index - 1);
+        }
+
+        return updatedMessages;
+      });
+
+      index++;
+
+      if (index >= text.length) {
+        clearInterval(interval);
+      }
+    }, typingSpeed);
   };
 
   useEffect(() => {
@@ -62,7 +87,7 @@ const ChatWidget = () => {
   }, [messages.length, isLoading]);
 
   return (
-    <div className="chat_wrapper fixed bottom-4 right-4 z-50">
+    <div className="chat_wrapper fixed bottom-4 right-4 z-50 ">
       <Button className="chat_button" onClick={handleToggle}>
         <img
           src={isOpen ? "/x-close.svg" : "/message.svg"}
@@ -75,7 +100,7 @@ const ChatWidget = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
-          className="mt-2 w-100 h-96 bg-white rounded-2xl shadow-xl flex flex-col"
+          className="mt-2 w-100 h-[40rem] bg-gray-50 rounded-2xl shadow-xl flex flex-col"
         >
           <div className="chat_Header">Chat Support</div>
           <div
