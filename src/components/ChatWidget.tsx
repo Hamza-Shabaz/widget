@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "../components/ui/button";
 import OpenAI from "openai";
 import "./style.css";
+import ShimmerMessage from "./ui/shimmer/shimmer";
 const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
   dangerouslyAllowBrowser: true,
@@ -19,7 +20,7 @@ const ChatWidget = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const iframeRef = useRef<HTMLDivElement>(null);
+  const chatBodyRef = useRef<HTMLDivElement>(null);
 
   const handleToggle = () => setIsOpen(!isOpen);
 
@@ -55,28 +56,13 @@ const ChatWidget = () => {
   };
 
   useEffect(() => {
-    const resizeObserver = new ResizeObserver(() => {
-      if (iframeRef.current) {
-        window.parent.postMessage(
-          { type: "resize", height: iframeRef.current.scrollHeight },
-          "*"
-        );
-      }
-    });
-
-    if (iframeRef.current) {
-      resizeObserver.observe(iframeRef.current);
+    if (chatBodyRef.current) {
+      chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
     }
-
-    return () => {
-      if (iframeRef.current) {
-        resizeObserver.unobserve(iframeRef.current);
-      }
-    };
-  }, [messages]);
+  }, [messages.length, isLoading]);
 
   return (
-    <div ref={iframeRef} className="chat_wrapper fixed bottom-4 right-4 z-50">
+    <div className="chat_wrapper fixed bottom-4 right-4 z-50">
       <Button className="chat_button" onClick={handleToggle}>
         <img
           src={isOpen ? "/x-close.svg" : "/message.svg"}
@@ -92,7 +78,10 @@ const ChatWidget = () => {
           className="mt-2 w-100 h-96 bg-white rounded-2xl shadow-xl flex flex-col"
         >
           <div className="chat_Header">Chat Support</div>
-          <div className="chat_body flex-1 overflow-y-auto p-4 space-y-2">
+          <div
+            className="chat_body flex-1 overflow-y-auto p-4 space-y-2"
+            ref={chatBodyRef}
+          >
             {messages.map((msg, idx) => (
               <div
                 key={idx}
@@ -105,7 +94,7 @@ const ChatWidget = () => {
                 {msg.text}
               </div>
             ))}
-            {isLoading && <div className="p-2">Loading...</div>}
+            {isLoading && <ShimmerMessage />}
           </div>
           <div className="chat_ft p-4 border-t flex items-center space-x-2">
             <input
