@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "../components/ui/button";
 import OpenAI from "openai";
@@ -19,6 +19,7 @@ const ChatWidget = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const iframeRef = useRef<HTMLDivElement>(null);
 
   const handleToggle = () => setIsOpen(!isOpen);
 
@@ -53,8 +54,29 @@ const ChatWidget = () => {
     }
   };
 
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver(() => {
+      if (iframeRef.current) {
+        window.parent.postMessage(
+          { type: "resize", height: iframeRef.current.scrollHeight },
+          "*"
+        );
+      }
+    });
+
+    if (iframeRef.current) {
+      resizeObserver.observe(iframeRef.current);
+    }
+
+    return () => {
+      if (iframeRef.current) {
+        resizeObserver.unobserve(iframeRef.current);
+      }
+    };
+  }, [messages]);
+
   return (
-    <div className="chat_wrapper fixed bottom-4 right-4 z-50">
+    <div ref={iframeRef} className="chat_wrapper fixed bottom-4 right-4 z-50">
       <Button className="chat_button" onClick={handleToggle}>
         <img
           src={isOpen ? "/x-close.svg" : "/message.svg"}
