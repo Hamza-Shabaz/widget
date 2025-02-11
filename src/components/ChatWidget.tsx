@@ -99,7 +99,7 @@ const ChatWidget = () => {
   return (
     <div
       ref={iframeRef}
-      className="chat_wrapper fixed bottom-4 right-4 left-4 z-50 "
+      className="chat_wrapper fixed bottom-4 pl-4 right-4 z-50 "
     >
       <Button className="chat_button" onClick={handleToggle}>
         <img
