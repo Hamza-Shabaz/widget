@@ -18,11 +18,15 @@ const ChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleToggle = () => setIsOpen(!isOpen);
 
   const handleSendMessage = async () => {
     if (input.trim()) {
+      setMessages([...messages, { text: input, sender: "user" }]);
+      setInput("");
+      setIsLoading(true);
       const response = await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [{ role: "user", content: input }],
@@ -35,8 +39,7 @@ const ChatWidget = () => {
         frequency_penalty: 0,
         presence_penalty: 0,
       });
-      setMessages([...messages, { text: input, sender: "user" }]);
-      setInput("");
+      setIsLoading(false);
       // Simulate bot response
       console.log(response.choices[0].message.content);
       if (response.choices[0].message.content) {
@@ -77,6 +80,7 @@ const ChatWidget = () => {
                 {msg.text}
               </div>
             ))}
+            {isLoading && <div className="p-2">Loading...</div>}
           </div>
           <div className="p-4 border-t flex items-center space-x-2">
             <input
