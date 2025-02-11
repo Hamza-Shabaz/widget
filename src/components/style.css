@@ -23,7 +23,7 @@
     color: #fff;
     border-radius: 12px 12px 0px 0px;
 }
-.msg_scr1 {
+.msg_scr2 {
     background: #f3f4f6;
     width: fit-content;
     display: flex;
@@ -34,7 +34,7 @@
     min-width: 10%;
     max-width: 85%;
 }
-.msg_scr2 {
+.msg_scr1 {
     background: #00a5f0;
     width: fit-content;
     display: flex;

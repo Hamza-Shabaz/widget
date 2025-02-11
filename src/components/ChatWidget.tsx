@@ -91,8 +91,15 @@ const ChatWidget = () => {
               className="flex-1 p-2 border rounded-xl"
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault(); // Prevent form submission or default behavior
+                  handleSendMessage();
+                }
+              }}
               placeholder="Type a message..."
             />
+
             <Button onClick={handleSendMessage}>
               <img src="/send.svg" alt="Send" className="w-6 h-6" />
             </Button>
