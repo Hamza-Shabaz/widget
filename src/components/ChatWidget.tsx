@@ -97,65 +97,72 @@ const ChatWidget = () => {
   }, [isOpen]);
 
   return (
-    <div
-      ref={iframeRef}
-      className="chat_wrapper fixed bottom-4 pl-4 right-4 z-50 "
-    >
-      <Button className="chat_button" onClick={handleToggle}>
-        <img
-          src={isOpen ? "/x-close.svg" : "/message.svg"}
-          alt={isOpen ? "Close" : "Chat"}
-          className="w-6 h-6"
-        />
-      </Button>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
-          className="mt-2 w-[350px] h-[400px] bg-gray-50 rounded-2xl shadow-xl flex flex-col" // Fixed width and height
-        >
-          <div className="chat_Header">Chat Support</div>
-          <div
-            className="chat_body flex-1 overflow-y-auto p-4 space-y-2"
-            ref={chatBodyRef}
-          >
-            {messages.map((msg, idx) => (
-              <div
-                key={idx}
-                className={`p-2 rounded-xl ${
-                  msg.sender === "user"
-                    ? "msg_scr1"
-                    : "msg_scr2 bg-gray-100 self-start"
-                }`}
-              >
-                {msg.text}
-              </div>
-            ))}
-            {isLoading && <ShimmerMessage />}
-          </div>
-          <div className="chat_ft p-4 border-t flex items-center space-x-2">
-            <input
-              type="text"
-              className="flex-1 p-2 border rounded-xl"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault(); // Prevent form submission or default behavior
-                  handleSendMessage();
-                }
-              }}
-              placeholder="Type a message..."
-            />
+    <div 
+    ref={iframeRef} 
+    className="chat_wrapper fixed bottom-4 pl-4 right-4 z-50">
+  {/* Open Chat Button (shown when chat is closed) */}
+  {!isOpen && (
+    <Button className="chat_button open" onClick={handleToggle}>
+      <img src="/message.svg" alt="Chat" className="w-6 h-6" />
+    </Button>
+  )}
 
-            <Button onClick={handleSendMessage}>
-              <img src="/send.svg" alt="Send" className="w-6 h-6" />
-            </Button>
-          </div>
-        </motion.div>
-      )}
-    </div>
+  {isOpen && (
+    <>
+      {/* Close Chat Button */}
+      <Button className="chat_button close" onClick={handleToggle}>
+        <img src="/x-close.svg" alt="Close" className="w-6 h-6" />
+      </Button>
+
+      {/* Chat Window */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 20 }}
+        className="mt-2 w-[350px] h-[400px] bg-gray-50 rounded-2xl shadow-xl flex flex-col"
+      >
+        <div className="chat_Header">Chat Support</div>
+        <div
+          className="chat_body flex-1 overflow-y-auto p-4 space-y-2"
+          ref={chatBodyRef}
+        >
+          {messages.map((msg, idx) => (
+            <div
+              key={idx}
+              className={`p-2 rounded-xl ${
+                msg.sender === "user"
+                  ? "msg_scr1"
+                  : "msg_scr2 bg-gray-100 self-start"
+              }`}
+            >
+              {msg.text}
+            </div>
+          ))}
+          {isLoading && <ShimmerMessage />}
+        </div>
+        <div className="chat_ft p-4 border-t flex items-center space-x-2">
+          <input
+            type="text"
+            className="flex-1 p-2 border rounded-xl"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleSendMessage();
+              }
+            }}
+            placeholder="Type a message..."
+          />
+          <Button onClick={handleSendMessage}>
+            <img src="/send.svg" alt="Send" className="w-6 h-6" />
+          </Button>
+        </div>
+      </motion.div>
+    </>
+  )}
+</div>
+
   );
 };
 

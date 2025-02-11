@@ -13,6 +13,17 @@
     position: absolute;
     right: 0;
     top: -55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+}
+.chat_button.close {
+    top: 20px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    border: 2px solid #fff;
 }
 .chat_button:hover {
     background-color: #00a5f0;
