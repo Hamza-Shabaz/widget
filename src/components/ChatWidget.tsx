@@ -2,6 +2,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "../components/ui/button";
+import OpenAI from "openai";
+console.log(process.env.OPENAI_API_KEY);
+const openai = new OpenAI({
+  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true,
+});
 
 interface Message {
   text: string;
@@ -15,17 +21,33 @@ const ChatWidget = () => {
 
   const handleToggle = () => setIsOpen(!isOpen);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (input.trim()) {
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [{ role: "user", content: input }],
+        response_format: {
+          type: "text",
+        },
+        temperature: 1,
+        max_completion_tokens: 2048,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0,
+      });
       setMessages([...messages, { text: input, sender: "user" }]);
       setInput("");
       // Simulate bot response
-      setTimeout(() => {
+      console.log(response.choices[0].message.content);
+      if (response.choices[0].message.content) {
         setMessages((prevMessages) => [
           ...prevMessages,
-          { text: "Hello! How can I help you?", sender: "bot" },
+          {
+            text: response.choices[0].message.content || "how can I help you ?",
+            sender: "bot",
+          },
         ]);
-      }, 1000);
+      }
     }
   };
 
