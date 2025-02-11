@@ -21,6 +21,7 @@ const ChatWidget = () => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const chatBodyRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLDivElement>(null);
 
   const handleToggle = () => setIsOpen(!isOpen);
 
@@ -86,8 +87,20 @@ const ChatWidget = () => {
     }
   }, [messages.length, isLoading]);
 
+  useEffect(() => {
+    if (iframeRef.current) {
+      const height = isOpen ? iframeRef.current.scrollHeight + 60 : 120;
+      const width = isOpen ? iframeRef.current.scrollWidth + 70 : 120;
+
+      window.parent.postMessage({ type: "resize", height, width }, "*");
+    }
+  }, [isOpen]);
+
   return (
-    <div className="chat_wrapper fixed bottom-4 right-4 z-50 ">
+    <div
+      ref={iframeRef}
+      className="chat_wrapper fixed bottom-4 right-4 left-4 z-50 "
+    >
       <Button className="chat_button" onClick={handleToggle}>
         <img
           src={isOpen ? "/x-close.svg" : "/message.svg"}
@@ -100,7 +113,7 @@ const ChatWidget = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
-          className="mt-2 w-100 h-[40rem] bg-gray-50 rounded-2xl shadow-xl flex flex-col"
+          className="mt-2 w-[350px] h-[400px] bg-gray-50 rounded-2xl shadow-xl flex flex-col" // Fixed width and height
         >
           <div className="chat_Header">Chat Support</div>
           <div
