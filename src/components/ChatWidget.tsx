@@ -1,9 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Button } from "../components/ui/button";
 import OpenAI from "openai";
-console.log(process.env.OPENAI_API_KEY);
+
 const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
   dangerouslyAllowBrowser: true,
@@ -20,7 +20,30 @@ const ChatWidget = () => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const widgetRef = useRef<HTMLDivElement>(null);
+
   const handleToggle = () => setIsOpen(!isOpen);
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      widgetRef.current &&
+      !widgetRef.current.contains(event.target as Node)
+    ) {
+      setIsOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
 
   const handleSendMessage = async () => {
     if (input.trim()) {
@@ -30,23 +53,18 @@ const ChatWidget = () => {
       const response = await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [{ role: "user", content: input }],
-        response_format: {
-          type: "text",
-        },
         temperature: 1,
-        max_completion_tokens: 2048,
+        max_tokens: 2048,
         top_p: 1,
         frequency_penalty: 0,
         presence_penalty: 0,
       });
       setIsLoading(false);
-      // Simulate bot response
-      console.log(response.choices[0].message.content);
       if (response.choices[0].message.content) {
         setMessages((prevMessages) => [
           ...prevMessages,
           {
-            text: response.choices[0].message.content || "how can I help you ?",
+            text: response.choices[0].message.content || "How can I help you?",
             sender: "bot",
           },
         ]);
@@ -61,6 +79,7 @@ const ChatWidget = () => {
       </Button>
       {isOpen && (
         <motion.div
+          ref={widgetRef}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
