@@ -3,6 +3,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "../components/ui/button";
 import OpenAI from "openai";
+import "./style.css";
 const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
   dangerouslyAllowBrowser: true,
@@ -53,26 +54,30 @@ const ChatWidget = () => {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
-      <Button className="rounded-full p-4 shadow-lg" onClick={handleToggle}>
-        {isOpen ? "Close" : "Chat"}
+    <div className="chat_wrapper fixed bottom-4 right-4 z-50">
+      <Button className="chat_button" onClick={handleToggle}>
+        <img
+          src={isOpen ? "/x-close.svg" : "/message.svg"}
+          alt={isOpen ? "Close" : "Chat"}
+          className="w-6 h-6"
+        />
       </Button>
       {isOpen && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
-          className="mt-2 w-80 h-96 bg-white rounded-2xl shadow-xl flex flex-col"
+          className="mt-2 w-100 h-96 bg-white rounded-2xl shadow-xl flex flex-col"
         >
-          <div className="p-4 border-b font-bold text-lg">Chat Support</div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-2">
+          <div className="chat_Header">Chat Support</div>
+          <div className="chat_body flex-1 overflow-y-auto p-4 space-y-2">
             {messages.map((msg, idx) => (
               <div
                 key={idx}
-                className={`p-2 rounded-xl max-w-xs ${
+                className={`p-2 rounded-xl ${
                   msg.sender === "user"
-                    ? "bg-blue-100 self-end"
-                    : "bg-gray-100 self-start"
+                    ? "msg_scr1"
+                    : "msg_scr2 bg-gray-100 self-start"
                 }`}
               >
                 {msg.text}
@@ -80,7 +85,7 @@ const ChatWidget = () => {
             ))}
             {isLoading && <div className="p-2">Loading...</div>}
           </div>
-          <div className="p-4 border-t flex items-center space-x-2">
+          <div className="chat_ft p-4 border-t flex items-center space-x-2">
             <input
               type="text"
               className="flex-1 p-2 border rounded-xl"
@@ -88,7 +93,9 @@ const ChatWidget = () => {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Type a message..."
             />
-            <Button onClick={handleSendMessage}>Send</Button>
+            <Button onClick={handleSendMessage}>
+              <img src="/send.svg" alt="Send" className="w-6 h-6" />
+            </Button>
           </div>
         </motion.div>
       )}
